@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "809516278463",
+    "project_id": "travelbusan",
+    "storage_bucket": "travelbusan.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:809516278463:android:340d352e1e863fd08f9c0a",
+        "android_client_info": {
+          "package_name": "com.example.capstone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEAhMi2-ZRyHIh3-2uERXaZrsuBmWxogw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
