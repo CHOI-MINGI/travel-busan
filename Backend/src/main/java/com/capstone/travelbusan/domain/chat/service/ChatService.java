@@ -141,4 +141,29 @@ public class ChatService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
+
+    @Transactional
+    public ChatDto.RoomResponse createDirectRoom(UUID userId, UUID guideId) {
+        User user = findUser(userId);
+        User guide = findUser(guideId);
+
+        // 이미 채팅방 있으면 기존 반환
+        List<ChatRoom> existing = chatRoomRepository.findByUserId(userId);
+        for (ChatRoom room : existing) {
+            if (room.getGuide().getId().equals(guideId) && !room.getIsClosed()) {
+                long unread = chatMessageRepository
+                        .countByChatRoom_RoomIdAndIsReadFalseAndSender_IdNot(room.getRoomId(), userId);
+                return ChatDto.RoomResponse.from(room, unread, "");
+            }
+        }
+
+        ChatRoom room = ChatRoom.builder()
+                .user(user)
+                .guide(guide)
+                .build();
+
+        ChatRoom saved = chatRoomRepository.save(room);
+        fcmService.sendNotification(guideId, "새 문의", user.getNickname() + "님이 문의를 시작했습니다.");
+        return ChatDto.RoomResponse.from(saved, 0, "");
+    }
 }

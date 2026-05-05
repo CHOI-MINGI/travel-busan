@@ -35,10 +35,11 @@ public class BidApplicationService {
         if (bidApplicationRepository.existsByUserBid_BidIdAndGuide_Id(bidId, guideId)) {
             throw new IllegalArgumentException("이미 참여한 입찰입니다.");
         }
-
         UserBid bid = userBidRepository.findById(bidId)
                 .orElseThrow(() -> new IllegalArgumentException("요청을 찾을 수 없습니다."));
-
+        if (bid.getIsClosed()) {
+            throw new IllegalArgumentException("이미 마감된 입찰입니다.");
+        }
         User guide = userRepository.findById(guideId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -94,7 +95,8 @@ public class BidApplicationService {
                 userId,
                 application.getGuide().getId()
         );
-
+        bid.close();
+        userBidRepository.save(bid);
         // 선택된 가이드에게 알림
         fcmService.sendNotification(
                 application.getGuide().getId(),

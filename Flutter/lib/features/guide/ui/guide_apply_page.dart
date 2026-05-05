@@ -215,7 +215,7 @@ class _GuideApplyPageState extends State<GuideApplyPage> {
                       ),
                       title: const Text('신청 완료'),
                       content: const Text(
-                        '가이드 신청이 완료되었습니다.\n실제 예약 저장과 결제는 백엔드 연결 후 동작합니다.',
+                        '가이드 신청이 완료되었습니다. 나중에 고쳐야됨.',
                       ),
                       actions: [
                         TextButton(

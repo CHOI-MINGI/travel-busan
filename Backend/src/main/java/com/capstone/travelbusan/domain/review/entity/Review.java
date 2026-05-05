@@ -1,47 +1,46 @@
-package com.capstone.travelbusan.domain.chat.entity;
+package com.capstone.travelbusan.domain.review.entity;
 
+import com.capstone.travelbusan.domain.guide.entity.GuideProduct;
 import com.capstone.travelbusan.domain.user.entity.User;
-import com.capstone.travelbusan.domain.userbid.entity.UserBid;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "chat_rooms")
+@Table(name = "reviews")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class ChatRoom {
+public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "room_id")
-    private UUID roomId;
+    @Column(name = "review_id")
+    private UUID reviewId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bid_id")
-    private UserBid userBid;
+    @JoinColumn(name = "guide_id", nullable = false)
+    private User guide;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "guide_id", nullable = false)
-    private User guide;
+    @JoinColumn(name = "service_id")
+    private GuideProduct service;
 
-    @Column(name = "is_closed", nullable = false)
-    @Builder.Default
-    private Boolean isClosed = false;
+    @Column(nullable = false, precision = 2, scale = 1)
+    private BigDecimal rating;
+
+    @Column(columnDefinition = "TEXT")
+    private String content;
 
     @Column(name = "created_at", updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    public void close() {
-        this.isClosed = true;
-    }
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:capstone/config/palette.dart';
 import 'package:capstone/features/core/network/dio_client.dart';
-import 'package:dio/dio.dart';
 
 class BidStatusPage extends StatefulWidget {
   const BidStatusPage({super.key});
@@ -13,6 +12,9 @@ class BidStatusPage extends StatefulWidget {
 class _BidStatusPageState extends State<BidStatusPage> {
   List<dynamic> _bids = [];
   bool _isLoading = false;
+
+  // 내가 참여한 입찰 ID 목록
+  final Set<String> _appliedBidIds = {};
 
   @override
   void initState() {
@@ -40,6 +42,54 @@ class _BidStatusPageState extends State<BidStatusPage> {
     }
   }
 
+  Future<void> _applyBid(String bidId) async {
+    try {
+      final response = await DioClient.instance.post(
+        '/api/v1/bid-applications',
+        data: {'bidId': bidId},
+      );
+      if (response.statusCode == 201) {
+        setState(() => _appliedBidIds.add(bidId));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('입찰에 참여했습니다!'),
+              backgroundColor: Color(0xFF0055FF),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('입찰 참여 실패: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _cancelBid(String bidId) async {
+    try {
+      final response = await DioClient.instance.delete(
+        '/api/v1/bid-applications/$bidId',
+      );
+      if (response.statusCode == 204) {
+        setState(() => _appliedBidIds.remove(bidId));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('입찰 참여를 취소했습니다.')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('취소 실패: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,7 +104,7 @@ class _BidStatusPageState extends State<BidStatusPage> {
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF0055FF)))
           : RefreshIndicator(
         onRefresh: _fetchBids,
         child: _bids.isEmpty ? _buildEmptyState() : _buildBidList(),
@@ -90,6 +140,8 @@ class _BidStatusPageState extends State<BidStatusPage> {
   Widget _buildBidCard(Map<String, dynamic> bid) {
     final courses = (bid['courses'] as List?) ?? [];
     final status = bid['status'] ?? 'PENDING';
+    final bidId = bid['bidId']?.toString() ?? '';
+    final isApplied = _appliedBidIds.contains(bidId);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -174,7 +226,7 @@ class _BidStatusPageState extends State<BidStatusPage> {
 
           // 요청 시간
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Row(
               children: [
                 Icon(Icons.access_time, size: 13, color: Colors.grey[400]),
@@ -184,6 +236,38 @@ class _BidStatusPageState extends State<BidStatusPage> {
                   style: TextStyle(color: Colors.grey[400], fontSize: 12),
                 ),
               ],
+            ),
+          ),
+
+          // ★ 입찰 참여 / 취소 버튼
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: SizedBox(
+              width: double.infinity,
+              child: isApplied
+                  ? OutlinedButton.icon(
+                onPressed: () => _cancelBid(bidId),
+                icon: const Icon(Icons.cancel_outlined, size: 16),
+                label: const Text('참여 취소', style: TextStyle(fontWeight: FontWeight.bold)),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.red,
+                  side: const BorderSide(color: Colors.red),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              )
+                  : ElevatedButton.icon(
+                onPressed: () => _applyBid(bidId),
+                icon: const Icon(Icons.handshake_outlined, size: 16),
+                label: const Text('입찰 참여하기', style: TextStyle(fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0055FF),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
             ),
           ),
         ],
@@ -208,10 +292,7 @@ class _BidStatusPageState extends State<BidStatusPage> {
             ),
           ),
           const SizedBox(width: 8),
-          Text(
-            course['placeName'] ?? '',
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-          ),
+          Text(course['placeName'] ?? '', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
           const SizedBox(width: 8),
           Text(
             course['startTime'] != null ? '${course['startTime']}'.substring(0, 5) : '',

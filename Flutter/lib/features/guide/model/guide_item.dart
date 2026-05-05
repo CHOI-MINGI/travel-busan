@@ -35,7 +35,8 @@ class GuideScheduleItem {
 
 class GuideItem {
   final int id;
-  final String serviceId; // UUID 원본 (수정/삭제/게시 API 호출용)
+  final String serviceId;
+  final String guideId; // 가이드 유저 ID (채팅/리뷰용)
   final String guideName;
   final String title;
   final String description;
@@ -59,6 +60,7 @@ class GuideItem {
   GuideItem({
     required this.id,
     required this.serviceId,
+    required this.guideId,
     required this.guideName,
     required this.title,
     required this.description,
@@ -104,7 +106,8 @@ class GuideItem {
 
     return GuideItem(
       id: rawServiceId.hashCode,
-      serviceId: rawServiceId,                                         // UUID 원본 보존
+      serviceId: rawServiceId,
+      guideId: json['guideUserId']?.toString() ?? '',
       guideName: json['guideName'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
@@ -133,6 +136,7 @@ class GuideItem {
   GuideItem copyWith({
     int? id,
     String? serviceId,
+    String? guideId,
     String? guideName,
     String? title,
     String? description,
@@ -156,6 +160,7 @@ class GuideItem {
     return GuideItem(
       id: id ?? this.id,
       serviceId: serviceId ?? this.serviceId,
+      guideId: guideId ?? this.guideId,
       guideName: guideName ?? this.guideName,
       title: title ?? this.title,
       description: description ?? this.description,

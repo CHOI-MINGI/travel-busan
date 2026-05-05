@@ -8,18 +8,19 @@ POST {{baseUrl}}/signup
 Content-Type: application/json
 
 {
-  "email": "test123@naver.com",
-  "password": "password123!",
-  "nickname": "부산갈매기"
+  "email": "test1234@naver.com",
+  "password": "password123!@",
+  "nickname": "사용자"
 }
+
 
 ### 2. 로그인 테스트
 POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
-  "email": "test123@naver.com",
-  "password": "password123!"
+  "email": "test1234@naver.com",
+  "password": "password123!@"
 }
 
 ### 추천 장소
@@ -27,4 +28,3 @@ GET http://localhost:8080/api/v1/places/recommend?category=인문(문화/예술/
 
 ### 인기 장소
 GET http://localhost:8080/api/v1/places/popular
-

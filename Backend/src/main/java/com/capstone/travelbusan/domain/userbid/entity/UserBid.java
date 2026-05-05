@@ -36,4 +36,12 @@ public class UserBid {
     @Column(name = "created_at", updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "is_closed", nullable = false)
+    @Builder.Default
+    private Boolean isClosed = false;
+
+    public void close() {
+        this.isClosed = true;
+    }
 }

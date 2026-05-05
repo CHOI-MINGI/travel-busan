@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -54,5 +55,15 @@ public class ChatController {
             @DestinationVariable UUID roomId,
             @Payload ChatDto.MessageRequest request) {
         chatService.sendMessage(roomId, UUID.fromString(request.getSenderId()), request.getContent());
+    }
+
+    // 가이드 탐색에서 바로 문의하기 (bid 없이 채팅방 생성)
+    @PostMapping("/api/v1/chat/rooms/direct")
+    public ResponseEntity<ChatDto.RoomResponse> createDirectRoom(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            @RequestBody Map<String, String> request) {
+        UUID guideId = UUID.fromString(request.get("guideId"));
+        return ResponseEntity.ok(
+                chatService.createDirectRoom(currentUser.getUserId(), guideId));
     }
 }

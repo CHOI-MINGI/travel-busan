@@ -11,8 +11,8 @@ import 'privacy_settings_page.dart';
 import 'profile_edit_page.dart';
 import 'support_page.dart';
 import 'visited_trips_page.dart';
-
-
+import 'my_bid_status_page.dart';
+import '../../chat/chat_room_list_page.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -71,6 +71,18 @@ class _MyPageState extends State<MyPage> {
               const SizedBox(height: 12),
               _buildSectionCard(
                 children: [
+                  _buildMenuRow(
+                    icon: Icons.send_outlined,
+                    title: '내 요청 현황',
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyBidStatusPage())),
+                  ),
+                  _buildDivider(),
+                  _buildMenuRow(
+                    icon: Icons.chat_bubble_outline,
+                    title: '채팅',
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatRoomListPage())),
+                  ),
+                  _buildDivider(),
                   _buildMenuRow(
                     icon: Icons.favorite_border,
                     title: '찜한 여행지',

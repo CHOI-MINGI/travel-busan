@@ -26,6 +26,7 @@ public class GuideProductResponseDto {
     private List<String> excludedItems;
     private List<String> relatedMaterials;
     private Boolean isPublished;
+    private String guideUserId;
 
     public static GuideProductResponseDto from(GuideProduct product) {
         return GuideProductResponseDto.builder()
@@ -45,6 +46,7 @@ public class GuideProductResponseDto {
                 .excludedItems(product.getExcludedItems())
                 .relatedMaterials(product.getRelatedMaterials())
                 .isPublished(product.getIsPublished())
+                .guideUserId(product.getGuider().getGuideId().toString())
                 .build();
     }
 }
